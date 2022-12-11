@@ -1,42 +1,43 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<time.h>
-int main()
-{
- int nf,N;
- int no_tr=0;
- 
- srand(time(NULL));
- printf("Enter no. of frames: "); scanf("%d",&nf);
- printf("\nEnter the Window size: "); scanf("%d",&N);
- printf("\n\n");
- 
- int i=1, j;
- while(i<=nf)
- {
- int x=0;
- for(j=i;j<i+N && j<=nf;j++,no_tr++) printf("Sent frame %d
-",j);
- 
- for(j=i;j<i+N && j<=nf;j++)
- {
- int flag = rand() % 2;
- 
- if(!flag)
- {
- printf("Acknowledgment for Frame %d\n",j);
- x++;
- }
- else
- { printf("Frame %d NOT Received\n", j);
- printf("Retransmitting Window\n");
- break;
- }
- }
- printf("\n");
- i += x;
- }
- printf("Total number of transmissions : %d\n",no_tr);
- 
- return 0;
+#include<bits/stdc++.h>
+
+#include<ctime>
+
+#define ll long long int
+using namespace std;
+
+void transmission(ll & i, ll & N, ll & tf, ll & tt) {
+  while (i <= tf) {
+    int z = 0;
+    for (int k = i; k < i + N && k <= tf; k++) {
+      cout << "Sending Frame " << k << "..." << endl;
+      tt++;
+    }
+    for (int k = i; k < i + N && k <= tf; k++) {
+      int f = rand() % 2;
+      if (!f) {
+        cout << "Acknowledgment for Frame " << k << "..." << endl;
+        z++;
+      } else {
+        cout << "Timeout!! Frame Number : " << k << " Not Received" << endl;
+        cout << "Retransmitting Window..." << endl;
+        break;
+      }
+    }
+    cout << "\n";
+    i = i + z;
+  }
+}
+
+int main() {
+  ll tf, N, tt = 0;
+  srand(time(NULL));
+  cout << "Enter the Total number of frames : ";
+  cin >> tf;
+  cout << "Enter the Window Size : ";
+  cin >> N;
+  ll i = 1;
+  transmission(i, N, tf, tt);
+  cout << "Total number of frames which were sent and resent are : " << tt <<
+    endl;
+  return 0;
 }
