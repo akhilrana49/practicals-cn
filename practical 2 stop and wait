@@ -1,0 +1,100 @@
+#include <iostream>
+#include <ctime>
+#include <unistd.h>
+using namespace std;
+class Receiver{
+ private:
+ int no_messages_received;
+ 
+ int receive(int packet_no){
+ if (packet_no < no_messages_received){
+ cout << "Receiver - \tDiscarded packet no " << packet_no
+<< endl;
+ cout << "Receiver - \tAcknowledgement sent for Packet 
+number " << packet_no << endl;
+ sleep(2);
+ return packet_no;
+ }
+ else{
+ cout << "Receiver - \tAcknowledgement sent for Packet 
+number " << packet_no << endl;
+ this->no_messages_received++;
+ if (rand()%7 > 5){
+ sleep(3);
+ return -2;
+ }
+ sleep(rand()%3);
+ return packet_no;
+ }
+ }
+ 
+ public:
+ Receiver(){
+ this->no_messages_received = 0;
+ }
+ 
+ void showPacketsReceived(){
+ cout << "Receiver - \tPackets received = " <<
+no_messages_received << endl;
+ }
+ 
+ friend class Sender;
+};
+class Sender{
+ private:
+ int noPackets;
+ 
+ public:
+ Sender(int noPackets){
+ this->noPackets = noPackets;
+ }
+ 
+ void send(Receiver& r){
+ int cur_packet_sending = 0;
+ while (cur_packet_sending < noPackets){
+ try{
+ time_t sent , now;
+ time(&sent);
+ cout << "Sender - \tSent packet number " <<
+cur_packet_sending << endl;
+ int ackNo = -3;
+ sleep(1);
+ time(&now);
+ while (((now - sent) < 4) && ackNo == -3 ){
+ ackNo = r.receive(cur_packet_sending);
+ time(&now);
+ }
+ if (ackNo < 0){
+ cout << "Sender - \tResending packet number " <<
+cur_packet_sending << endl;
+ while (ackNo != cur_packet_sending){
+ ackNo = r.receive(cur_packet_sending);
+ }
+ }
+ 
+ if (ackNo == cur_packet_sending){
+ cout << "Sender - \tAcknowledgement received for 
+packet number " << cur_packet_sending << endl;
+ cur_packet_sending++;
+ }
+ cout << endl;
+ }
+ catch (const char* exp){
+ cout << "Exception Occurred" << endl;
+ }
+ }
+ }
+};
+int main(){
+ int user_packets;
+ cout << "How many packets do you want to send to the receiver ";
+ cin >> user_packets;
+ 
+ Sender s(user_packets);
+ Receiver r;
+ 
+ s.send(r);
+ cout << endl;
+ r.showPacketsReceived();
+ return 0;
+}
